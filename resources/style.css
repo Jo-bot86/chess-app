@@ -1,0 +1,79 @@
+.root{
+	-fx-background-color: #7a1414;
+}
+
+.button{
+	-fx-background-radius: 0px;
+}
+
+.button:hover{
+	//-fx-background-color: #eafa75;
+}
+
+.black-button{
+	-fx-background-color: linear-gradient(to bottom right, #04de13, #147a1b);
+}
+
+.white-button{
+	-fx-background-color: #b9c9b9;
+}
+
+.label {
+	-fx-background-color: lightgray;
+}
+
+.border-left {
+	-fx-border-style: hidden hidden hidden solid;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-top {
+	-fx-border-style: solid hidden hidden hidden;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-right {
+	-fx-border-style: hidden solid hidden hidden;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-bottom {
+	-fx-border-style: hidden hidden solid hidden;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-left-top {
+	-fx-border-style: solid hidden hidden solid;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-right-top {
+	-fx-border-style: solid solid hidden hidden;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-left-bottom {
+	-fx-border-style: hidden hidden solid solid;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
+
+.border-right-bottom {
+	-fx-border-style: hidden solid solid hidden;
+	-fx-border-width: 10px;
+    -fx-border-color: black;
+    -fx-border-insets: -10px;
+}
