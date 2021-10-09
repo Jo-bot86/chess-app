@@ -72,5 +72,15 @@ public class BauerTest {
 		assertEquals(alleFelder.get(0).getZeilenIndex(), amZugBauer.alleValidenFelderBlack().get(0).getZeilenIndex());
 
 	}
+	
+	@Test
+	public void isUmwandelbar() {
+		Bauer testBauer = new Bauer(6,4, WHITE);
+		Brett.getBrett()[6][4].setFigur(testBauer);
+		testBauer.moveTo2(Brett.getBrett()[0][4]);
+		testBauer.bestimmeAlleValidenFelder();
+		Brett.print();
+		assertEquals(false, testBauer.isUmwandelbar());
+	}
 
 }

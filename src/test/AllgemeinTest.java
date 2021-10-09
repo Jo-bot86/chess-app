@@ -1,15 +1,17 @@
 package test;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import de.chessgame.logic.ablauf.SpielAblauf;
 import de.chessgame.logic.brett.Brett;
-import de.chessgame.logic.brett.feld.Feld;
-import de.chessgame.logic.brett.feld.figur.typ.Springer;
-import de.chessgame.persistence.Leser;
+import de.chessgame.logic.brett.feld.figur.Farbe;
+import de.chessgame.logic.brett.feld.figur.Figur;
+
 
 /**
  * Diese Klasse testet verschiedene Situationen in denen sich das Programm nicht
@@ -25,21 +27,21 @@ public class AllgemeinTest {
 	public void init() {
 		ablauf = new SpielAblauf(new Brett(8, 8));
 	}
-
+	
 	@Test
-	public void springerValideZuege() {
-		File quelle = new File("resources/spielstaende/gespeichertesBrett");
-		Leser leser = new Leser();
-		SpielAblauf gelesenerAblauf = leser.leseSpielAblauf(quelle);
-		Feld[][] gelesenerBrettInhalt = gelesenerAblauf.getBrettInhalt();
-		Brett.setBrett(gelesenerBrettInhalt);
-		ablauf.setAktuelleFarbeAmZug(gelesenerAblauf.getAktuelleFarbeAmZug());
-
-		Springer springer = (Springer) Brett.getBrett()[2][2].getFigur();
-		for (int i = 0; i < springer.getMoeglicheZielFelder().size(); i++) {
-			System.out.println(springer.getMoeglicheZielFelder().get(i).getZeilenIndex() + " "
-					+ springer.getMoeglicheZielFelder().get(i).getSpaltenIndex());
-		}
-		Brett.print();
+	public void koenigSollteKeineValidenZuegeHaben() {
+		ablauf.getBrett().init();
+		ablauf.setAktuelleFarbeAmZug(Farbe.BLACK);
+		Brett.getBrett()[1][0].getFigur().moveTo2(Brett.getBrett()[3][0]);
+		Brett.getBrett()[1][4].getFigur().moveTo2(Brett.getBrett()[2][4]);
+		Brett.getBrett()[6][3].getFigur().moveTo2(Brett.getBrett()[2][4]);
+		Brett.getBrett()[6][4].getFigur().moveTo2(Brett.getBrett()[3][4]);
+		Brett.getBrett()[0][4].getFigur().moveTo2(Brett.getBrett()[4][7]);
+		Brett.getBrett()[7][3].getFigur().moveTo2(Brett.getBrett()[5][7]);
+		Brett.getBrett()[7][5].getFigur().moveTo2(Brett.getBrett()[5][3]);
+		List<Figur> alleFiguren =ablauf.bestimmeAlleFigurenMitValidenZuegen();
+		assertEquals(0, alleFiguren.size());
+		
+//		Brett.print();
 	}
 }
