@@ -119,7 +119,7 @@ public class Brett implements Serializable{
 		// stellt den weiﬂen Koenig auf
 		brett[brett.length - 1][brett[0].length - 4].setFigur(new Koenig(brett.length - 1, brett[0].length - 4, WHITE));
 
-		setValideZuegeFuerAlleFiguren();
+//		setValideZuegeFuerAlleFiguren();
 	}
 
 	/**

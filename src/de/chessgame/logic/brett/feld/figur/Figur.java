@@ -36,6 +36,11 @@ public abstract class Figur implements Serializable {
 	 * Gibt den Spaltenindex des Feldes auf dem sich die Figur befindet an.
 	 */
 	protected int spaltenIndex;
+	
+	/**
+	 * Enthält den Wert einer Figur
+	 */
+	protected int figurWert;
 
 	/**
 	 * Enthält für ein Objekt einer erbenden Klasse alle potentiellen Feld-Objekte
@@ -57,7 +62,7 @@ public abstract class Figur implements Serializable {
 	}
 
 	/**
-	 * Prüft ob sich das Figur-Objekt am Rand befindet, dh. spaltenIndex 0 oder 7
+	 * Prüft ob sich das Figur-Objekt am Rand befindet, dh. zeilen- bzw. spaltenIndex 0 oder 7
 	 * hat Hat das Objekt spaltenIndex 0 gibt die Methode 1 zurück. Hat das Objekt
 	 * spaltenIndex 7 gibt die Methode 2 zurück. Für den zeilenIndex 0 gibt sie 3
 	 * zurück und für den zeilenIndex 7 gibt sie 4 zurück sonst 0.
@@ -224,6 +229,20 @@ public abstract class Figur implements Serializable {
 	 */
 	public void setMoeglicheZielFelder(List<Feld> moeglicheZielFelder) {
 		this.moeglicheZielFelder = moeglicheZielFelder;
+	}
+
+	/**
+	 * @return the figurWert
+	 */
+	public int getFigurWert() {
+		return figurWert;
+	}
+
+	/**
+	 * @param figurWert the figurWert to set
+	 */
+	public void setFigurWert(int figurWert) {
+		this.figurWert = figurWert;
 	}
 
 }
