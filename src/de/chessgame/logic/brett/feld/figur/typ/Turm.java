@@ -25,6 +25,11 @@ public class Turm extends Figur {
 	 * Speichert ein Objekt der Klasse TurmBewegung
 	 */
 	private TurmBewegung turmBewegung;
+	
+	/**
+	 * Gibt an, ob der König nicht bewegt wurde. Nötig um evtl. eine Rochade auszuführen.
+	 */
+	private boolean unbewegt;
 
 	/**
 	 * ruft den Konstruktor der Elternklasse mit dem Zeilen- und Spaltenindex sowie
@@ -38,6 +43,8 @@ public class Turm extends Figur {
 	public Turm(int zeilenIndex, int spaltenIndex, Farbe farbe) {
 		super(zeilenIndex, spaltenIndex, farbe);
 		turmBewegung = new TurmBewegung(this);
+		unbewegt = true;
+		figurWert = 5;
 	}
 
 	/**
@@ -186,6 +193,20 @@ public class Turm extends Figur {
 			return bestimmeAlleValidenFelderRand();
 		}
 		return bestimmeAlleValidenFelderInnen();
+	}
+
+	/**
+	 * @return the unbewegt
+	 */
+	public boolean isUnbewegt() {
+		return unbewegt;
+	}
+
+	/**
+	 * @param unbewegt the unbewegt to set
+	 */
+	public void setUnbewegt(boolean unbewegt) {
+		this.unbewegt = unbewegt;
 	}
 
 }

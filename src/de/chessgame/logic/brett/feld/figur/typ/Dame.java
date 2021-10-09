@@ -47,6 +47,7 @@ public class Dame extends Figur {
 		super(zeilenIndex, spaltenIndex, farbe);
 		laeuferBewegung = new LaeuferBewegung(this);
 		turmBewegung = new TurmBewegung(this);
+		figurWert = 9;
 	}
 
 	/**

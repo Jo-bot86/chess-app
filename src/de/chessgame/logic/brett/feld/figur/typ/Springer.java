@@ -44,6 +44,7 @@ public class Springer extends Figur {
 	 */
 	public Springer(int zeilenIndex, int spaltenIndex, Farbe farbe) {
 		super(zeilenIndex, spaltenIndex, farbe);
+		figurWert=3;
 	}
 
 	/**

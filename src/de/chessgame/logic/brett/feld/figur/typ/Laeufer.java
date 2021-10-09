@@ -38,6 +38,7 @@ public class Laeufer extends Figur {
 	public Laeufer(int zeilenIndex, int spaltenIndex, Farbe farbe) {
 		super(zeilenIndex, spaltenIndex, farbe);
 		laeuferBewegung = new LaeuferBewegung(this);
+		figurWert = 3;
 	}
 
 	/**
