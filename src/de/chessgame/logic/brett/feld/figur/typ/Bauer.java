@@ -28,7 +28,18 @@ public class Bauer extends Figur implements Serializable {
 	private static final long serialVersionUID = 3707551796474659051L;
 
 	/**
-	 * ruft den Konstruktor der Elternklasse mit dem Zeilen- und Spaltenindex sowie
+	 * Gibt an ob dieses Bauer-Objekt en passant schlagbar ist
+	 */
+	private boolean enPassantSchlagbar;
+
+	/**
+	 * Gibt an ob das Bauer-Objekt das Feld komplett überquert hat und eine
+	 * Bauernumwandlung erlaubt ist
+	 */
+	private boolean umwandelbar;
+
+	/**
+	 * Ruft den Konstruktor der Elternklasse mit dem Zeilen- und Spaltenindex sowie
 	 * mit einer Farbe auf. Instanzen dieser Bauer-Klasse können ein Feld vorrücken
 	 * sofern das Zielfeld nicht besetzt ist. Sie können auch zwei Züge vorrücken
 	 * wenn weder das Zielfeld noch das Feld zwischen dem aktuellen und dem Zielfeld
@@ -43,12 +54,16 @@ public class Bauer extends Figur implements Serializable {
 	public Bauer(int zeilenIndex, int spaltenIndex, Farbe farbe) {
 		super(zeilenIndex, spaltenIndex, farbe);
 		this.moeglicheZielFelder = bestimmeAlleValidenFelder();
+		enPassantSchlagbar = false;
+		figurWert = 1;
+		umwandelbar = false;
 	}
 
 	/**
 	 * Bestimmt alle validen Zielfelder eines schwarzen Bauern, die vertikal
-	 * verlaufen. Handelt es sich um den ersten Zug eines Bauern-Objekts
-	 * kann es vertikal auch zwei Schritte vorrücken.
+	 * verlaufen. Handelt es sich um den ersten Zug eines Bauern-Objekts kann es
+	 * vertikal auch zwei Schritte vorrücken.
+	 * 
 	 * @param zeilenIndex Der Zeileninde des Bauern-Objekts
 	 * @return Liste aller potentiellen Zielfelder in vertikaler Richtung
 	 */
@@ -73,9 +88,10 @@ public class Bauer extends Figur implements Serializable {
 	}
 
 	/**
-	 * Bestimmt alle validen Zielfelder eines weißen Bauern, die vertikal
-	 * verlaufen. Handelt es sich um den ersten Zug eines Bauern-Objekts
-	 * kann es vertikal auch zwei Schritte vorrücken.
+	 * Bestimmt alle validen Zielfelder eines weißen Bauern, die vertikal verlaufen.
+	 * Handelt es sich um den ersten Zug eines Bauern-Objekts kann es vertikal auch
+	 * zwei Schritte vorrücken.
+	 * 
 	 * @param zeilenIndex Der Zeileninde des Bauern-Objekts
 	 * @return Liste aller potentiellen Zielfelder in vertikaler Richtung
 	 */
@@ -100,7 +116,7 @@ public class Bauer extends Figur implements Serializable {
 	}
 
 	/**
-	 * bestimmt alle validen Felder auf die das schwarze Bauer-Objekt ziehen kann.
+	 * Bestimmt alle validen Felder auf die das schwarze Bauer-Objekt ziehen kann.
 	 * Möglich sind ein Feld vorzurücken oder die zwei diagonal Felder in vorwärts
 	 * Richtung. Berücksichtig außerdem beim Zugriff auf die Felder ob es sich bei
 	 * der aktuellen Position des Objekts um ein Randfeld handelt. Der Fall, dass
@@ -126,9 +142,17 @@ public class Bauer extends Figur implements Serializable {
 		// Das Objekt befindet sich am Rand und hat den spaltenIndex 0
 		if (zeilenIndex < 7) {
 			if (isRandFigur() == 1) {
-				// prüft ob es eine Figur schlagen kann
+				// prüft ob es eine Figur regulär schlagen kann
 				potentiellesFeld = Brett.getBrett()[zeilenIndex + 1][spaltenIndex + 1];
 				if (potentiellesFeld.getFigur() != null && potentiellesFeld.getFigur().getFarbe() == WHITE) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
+				// prüft, ob es einen gegnerischen Bauer en passant schlagen kann
+				Feld gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex + 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() + 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == WHITE
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
 					alleValidenFelder.add(potentiellesFeld);
 				}
 			}
@@ -139,12 +163,14 @@ public class Bauer extends Figur implements Serializable {
 				if (potentiellesFeld.getFigur() != null && potentiellesFeld.getFigur().getFarbe() == WHITE) {
 					alleValidenFelder.add(potentiellesFeld);
 				}
-			}
-			// Das Objekt hat das Feld komplett überquert und der Spieler darf eine Figur
-			// die
-			// vom Gegner geschlagen wurde zurückfordern
-			if (isRandFigur() == 4) {
-				// TODO Aufruf einer Methode die es erlaubt eine Figur auszusuchen
+				// prüft, ob es einen gegnerischen Bauer en passant schlagen kann
+				Feld gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex - 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() + 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == WHITE
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
 			}
 			// Das Objekt befindet sich nicht am Rand und muss beide diagonalen überprüfen
 			if (isRandFigur() == 0) {
@@ -156,7 +182,30 @@ public class Bauer extends Figur implements Serializable {
 				if (potentiellesFeld.getFigur() != null && potentiellesFeld.getFigur().getFarbe() == WHITE) {
 					alleValidenFelder.add(potentiellesFeld);
 				}
+				// prüft, ob es einen gegnerischen Bauer nach links en passant schlagen kann
+				Feld gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex + 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() + 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == WHITE
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
+				// prüft, ob es einen gegnerischen Bauer nach rechts en passant schlagen kann
+				gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex - 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() + 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == WHITE
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
 			}
+		}
+		// Das Objekt hat das Feld komplett überquert und der Spieler darf eine Figur
+		// die
+		// vom Gegner geschlagen wurde zurückfordern
+		if (isRandFigur() == 4) {
+			umwandelbar = true;
+			System.out.println("Kommt hier nicht rein");
 		}
 		return alleValidenFelder;
 	}
@@ -186,10 +235,17 @@ public class Bauer extends Figur implements Serializable {
 		// Das Objekt befindet sich am Rand und hat den spaltenIndex 0
 		if (zeilenIndex > 0) {
 			if (isRandFigur() == 1) {
-				// prüft ob es eine Figur schlagen kann
-
+				// prüft ob es eine Figur regulär schlagen kann
 				potentiellesFeld = Brett.getBrett()[zeilenIndex - 1][spaltenIndex + 1];
 				if (potentiellesFeld.getFigur() != null && potentiellesFeld.getFigur().getFarbe() == BLACK) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
+				// prüft, ob es einen gegnerischen Bauer en passant schlagen kann
+				Feld gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex + 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() - 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == BLACK
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
 					alleValidenFelder.add(potentiellesFeld);
 				}
 
@@ -201,13 +257,16 @@ public class Bauer extends Figur implements Serializable {
 				if (potentiellesFeld.getFigur() != null && potentiellesFeld.getFigur().getFarbe() == BLACK) {
 					alleValidenFelder.add(potentiellesFeld);
 				}
+				// prüft, ob es einen gegnerischen Bauer en passant schlagen kann
+				Feld gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex - 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() - 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == BLACK
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
 			}
-			// Das Objekt hat das Feld komplett überquert und der Spieler darf eine Figur
-			// die
-			// vom Gegner geschlagen wurde zurückfordern
-			if (isRandFigur() == 3) {
-				// TODO Aufruf einer Methode die es erlaubt eine Figur auszusuchen
-			}
+
 			// Das Objekt befindet sich nicht am Rand und muss beide diagonalen überprüfen
 			if (isRandFigur() == 0) {
 				potentiellesFeld = Brett.getBrett()[zeilenIndex - 1][spaltenIndex - 1];
@@ -218,7 +277,28 @@ public class Bauer extends Figur implements Serializable {
 				if (potentiellesFeld.getFigur() != null && potentiellesFeld.getFigur().getFarbe() == BLACK) {
 					alleValidenFelder.add(potentiellesFeld);
 				}
+				// prüft, ob es einen gegnerischen Bauer en passant schlagen kann
+				Feld gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex + 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() - 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == BLACK
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
+				gegnerFeld = Brett.getBrett()[zeilenIndex][spaltenIndex - 1];
+				potentiellesFeld = Brett.getBrett()[gegnerFeld.getZeilenIndex() - 1][gegnerFeld.getSpaltenIndex()];
+				if (gegnerFeld != null && gegnerFeld.getFigur() instanceof Bauer
+						&& gegnerFeld.getFigur().getFarbe() == BLACK
+						&& ((Bauer) gegnerFeld.getFigur()).isEnPassantSchlagbar()) {
+					alleValidenFelder.add(potentiellesFeld);
+				}
 			}
+		}
+		// Das Objekt hat das Feld komplett überquert und der Spieler darf eine Figur
+		// die
+		// vom Gegner geschlagen wurde zurückfordern
+		if (isRandFigur() == 3) {
+			umwandelbar = true;
 		}
 		return alleValidenFelder;
 	}
@@ -233,7 +313,7 @@ public class Bauer extends Figur implements Serializable {
 	 * @return alleValidenFelder Eine Liste mit allen validen Feld-Objekten für eine
 	 *         bestimmte Farbe
 	 * 
-	 * @see {@link #alleValidenFelderBlack()} 
+	 * @see {@link #alleValidenFelderBlack()}
 	 * @see {@link #alleValidenFelderWhite()}
 	 */
 	@Override
@@ -242,6 +322,34 @@ public class Bauer extends Figur implements Serializable {
 			return alleValidenFelderBlack();
 		}
 		return alleValidenFelderWhite();
+	}
+
+	/**
+	 * @return the enPassantSchlagbar
+	 */
+	public boolean isEnPassantSchlagbar() {
+		return enPassantSchlagbar;
+	}
+
+	/**
+	 * @param enPassantSchlagbar the enPassantSchlagbar to set
+	 */
+	public void setEnPassantSchlagbar(boolean enPassantSchlagbar) {
+		this.enPassantSchlagbar = enPassantSchlagbar;
+	}
+
+	/**
+	 * @return the umwandelbar
+	 */
+	public boolean isUmwandelbar() {
+		return umwandelbar;
+	}
+
+	/**
+	 * @param umwandelbar the umwandelbar to set
+	 */
+	public void setUmwandelbar(boolean umwandelbar) {
+		this.umwandelbar = umwandelbar;
 	}
 
 //	TODO die Methode alle ValidenFelder muss nach jedem Zug neu aufgerufen werden
