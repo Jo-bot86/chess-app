@@ -22,6 +22,12 @@
 	-fx-background-color: lightgray;
 }
 
+#punkteStand {
+	-fx-background-color: #7a1414;
+	-fx-text-fill: white;
+	-fx-font-size: 15px;
+}
+
 .border-left {
 	-fx-border-style: hidden hidden hidden solid;
 	-fx-border-width: 10px;
