@@ -15,7 +15,7 @@ import de.chessgame.logic.brett.feld.figur.bewegungen.LaeuferBewegung;
 import de.chessgame.logic.brett.feld.figur.bewegungen.TurmBewegung;
 
 /**
- *  Repräsentiert die Schachfigur König. Stellt Methoden zur Bestimmung der
+ * Repräsentiert die Schachfigur König. Stellt Methoden zur Bestimmung der
  * validen Zielfelder eines König-Objekts bereit.
  * 
  * @author Josef Weldemariam
@@ -37,6 +37,11 @@ public class Koenig extends Figur {
 	 * Speichert ein Objekt der Klasse TurmBewegung
 	 */
 	private TurmBewegung turmBewegung;
+	
+	/**
+	 * Gibt an, ob der König nicht bewegt wurde. Nötig um evtl. eine Rochade auszuführen.
+	 */
+	private boolean unbewegt;
 
 	/**
 	 * ruft den Konstruktor der Elternklasse mit dem Zeilen- und Spaltenindex sowie
@@ -45,13 +50,30 @@ public class Koenig extends Figur {
 	 * @param zeilenIndex  Zeilenindex des König-Objekts
 	 * @param spaltenIndex Spaltenindex des König-Objekts
 	 * @param farbe        Farbe des König-Objekts
-	 * @see {@link de.chessgame.logic.brett.feld.figur.bewegungen.TurmBewegung TurmBewegung}
-	 * @see {@link de.chessgame.logic.brett.feld.figur.bewegungen.LaeuferBewegung LaeuferBewegung }
+	 * @see {@link de.chessgame.logic.brett.feld.figur.bewegungen.TurmBewegung
+	 *      TurmBewegung}
+	 * @see {@link de.chessgame.logic.brett.feld.figur.bewegungen.LaeuferBewegung
+	 *      LaeuferBewegung }
 	 */
 	public Koenig(int zeilenIndex, int spaltenIndex, Farbe farbe) {
 		super(zeilenIndex, spaltenIndex, farbe);
 		laeuferBewegung = new LaeuferBewegung(this);
 		turmBewegung = new TurmBewegung(this);
+		unbewegt = true;
+	}
+	
+	/**
+	 * Gibt an ob der König der aktuellen Farbe am Zug im Schach steht
+	 * 
+	 * @return true genau dann wenn der König der aktuellen Farbe im Schach steht
+	 */
+	public boolean isSchach() {
+		List<Feld> alleBedrohtenFelder = getAlleBedrohtenFelder();
+		Feld aktuellesFeldVonKoenig = Brett.getBrett()[zeilenIndex][spaltenIndex];
+		if(alleBedrohtenFelder.contains(aktuellesFeldVonKoenig)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -253,32 +275,27 @@ public class Koenig extends Figur {
 		List<Feld> alleBedrohtenFelder = new ArrayList<Feld>();
 		List<Feld> alleVonBauernBedrohtenFelder = getAlleVonBauernBedrohtenFelder();
 		List<Feld> alleVonNichtBauernBedrohtenFelder = getAlleVonNichtBauernBedrohtenFelder();
-		
+
 		// Füge alle von Bauern bedrohten Felder hinzu
 		alleBedrohtenFelder.addAll(alleVonBauernBedrohtenFelder);
 
 		// Füge alle von den restlichen Figuren bedrohten Felder hinzu
 		alleBedrohtenFelder.addAll(alleVonNichtBauernBedrohtenFelder);
-		
+
 		return alleBedrohtenFelder;
 	}
 
 	/**
-	 * Bestimmt alle von der gegnerischen Farbe bedrohten Felder wobei all drohenden
-	 * Figuren keine Bauern sind
+	 * Bestimmt alle von der gegnerischen Farbe bedrohten Felder wobei alle
+	 * drohenden Figuren keine Bauern sind. Wird für getAlleBedrohtenFelder
+	 * gebraucht
 	 */
 	public List<Feld> getAlleVonNichtBauernBedrohtenFelder() {
 		List<Feld> alleVonNichtBauernBedrohtenFelder = new ArrayList<Feld>();
 		for (Feld[] feldReihe : Brett.getBrett()) {
 			for (Feld feld : feldReihe) {
-				if (feld.getFigur() != null) {
-					if (farbe == BLACK && feld.getFigur().getFarbe() == WHITE) {
-						List<Feld> alleValidenFelder = feld.getFigur().bestimmeAlleValidenFelder();
-						if (alleValidenFelder.size() > 0) {
-							alleVonNichtBauernBedrohtenFelder.addAll(alleValidenFelder);
-						}
-					}
-					if (farbe == WHITE && feld.getFigur().getFarbe() == BLACK) {
+				if (feld.getFigur() != null && !(feld.getFigur() instanceof Bauer)) {
+					if (farbe != feld.getFigur().getFarbe()) {
 						List<Feld> alleValidenFelder = feld.getFigur().bestimmeAlleValidenFelder();
 						if (alleValidenFelder.size() > 0) {
 							alleVonNichtBauernBedrohtenFelder.addAll(alleValidenFelder);
@@ -292,8 +309,8 @@ public class Koenig extends Figur {
 	}
 
 	/**
-	 * Gibt eine Liste aller von Bauern bedrohten Feldern der gegnerischen
-	 * Farbe zurueck.
+	 * Gibt eine Liste aller von Bauern bedrohten Feldern der gegnerischen Farbe
+	 * zurueck. Wird für getAlleBedrohtenFelder gebraucht
 	 * 
 	 * @return Eine Liste aller von Bauern der gegnerischen Farbe bedrohten Felder
 	 */
@@ -302,22 +319,6 @@ public class Koenig extends Figur {
 		List<Feld> alleVonBauernBedrohtenFelder = new ArrayList<Feld>();
 		for (Feld bauernFeld : alleBauernFelder) {
 			if (farbe == BLACK) {
-				if (bauernFeld.getZeilenIndex() < 7 && bauernFeld.getSpaltenIndex() > 0
-						&& bauernFeld.getSpaltenIndex() < 7) {
-					alleVonBauernBedrohtenFelder
-							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() - 1]);
-					alleVonBauernBedrohtenFelder
-							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() + 1]);
-				}
-				if (bauernFeld.getZeilenIndex() < 7 && bauernFeld.getSpaltenIndex() == 0) {
-					alleVonBauernBedrohtenFelder
-							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() + 1]);
-				}
-				if (bauernFeld.getZeilenIndex() < 7 && bauernFeld.getSpaltenIndex() == 7) {
-					alleVonBauernBedrohtenFelder
-							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() - 1]);
-				}
-			} else {
 				if (bauernFeld.getZeilenIndex() > 0 && bauernFeld.getSpaltenIndex() > 0
 						&& bauernFeld.getSpaltenIndex() < 7) {
 					alleVonBauernBedrohtenFelder
@@ -332,6 +333,22 @@ public class Koenig extends Figur {
 				if (bauernFeld.getZeilenIndex() > 0 && bauernFeld.getSpaltenIndex() == 7) {
 					alleVonBauernBedrohtenFelder
 							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() - 1][bauernFeld.getSpaltenIndex() - 1]);
+				}
+			} else {
+				if (bauernFeld.getZeilenIndex() < 7 && bauernFeld.getSpaltenIndex() > 0
+						&& bauernFeld.getSpaltenIndex() < 7) {
+					alleVonBauernBedrohtenFelder
+							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() - 1]);
+					alleVonBauernBedrohtenFelder
+							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() + 1]);
+				}
+				if (bauernFeld.getZeilenIndex() < 7 && bauernFeld.getSpaltenIndex() == 0) {
+					alleVonBauernBedrohtenFelder
+							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() + 1]);
+				}
+				if (bauernFeld.getZeilenIndex() < 7 && bauernFeld.getSpaltenIndex() == 7) {
+					alleVonBauernBedrohtenFelder
+							.add(Brett.getBrett()[bauernFeld.getZeilenIndex() + 1][bauernFeld.getSpaltenIndex() - 1]);
 				}
 			}
 		}
@@ -366,14 +383,35 @@ public class Koenig extends Figur {
 	}
 
 	/**
-	 * Ruft abhängig von der Position des König-Objekts,
-	 * bestimmeAlleValidenFelderEcke(), bestimmeAlleValidenFelderRand() oder
-	 * bestimmeAlleValidenFelderInnen() auf.
+	 * Bestimmt alle echt validen Felder des Königs noch vor seinem Zug. Hier kann
+	 * es vorkommen, dass wenn der König eine Figur schlägt, dann auf einem Feld
+	 * steht dass von einer anderen Figur bedroht wird. Das liegt daran, dass das
+	 * Feld auf dem die geschlagene Figur stand nicht zu den validen Ziel-Feldern
+	 * der nun bedrohenden Figur zählt. Somit muss noch geprüft werden ob der König
+	 * auf diesen potentiellen Feldern im Schach steht.
 	 * 
-	 * @return eine Liste aller potentiellen Zielfelder
+	 * @return Eine Liste aller validen Ziel-Felder des Königs
+	 */
+	public List<Feld> bestimmeAlleEchtValidenFelder() {
+		List<Feld> alleEchtValidenFelder = new ArrayList<Feld>();
+		List<Feld> alleValidenFelderVorBereinigung = bestimmeAlleValidenFelder();
+		List<Feld> alleBedrohtenFelder = getAlleBedrohtenFelder();
+		for (int i = 0; i < alleValidenFelderVorBereinigung.size(); i++) {
+			if (!(alleBedrohtenFelder.contains(alleValidenFelderVorBereinigung.get(i)))) {
+				alleEchtValidenFelder.add(alleValidenFelderVorBereinigung.get(i));
+			}
+		}
+		return alleEchtValidenFelder;
+	}
+
+	/**
+	 * Bestimmt eine Vorauswahl aller potentiellen Zielfelder des König-Objekts.
+	 * Hier werden bedrohte Felder nicht berücksichtigt
+	 * 
+	 * @return eine Liste aller potentiellen Zielfelder vor Bereinigung
 	 */
 	@Override
-	public List<Feld> bestimmeAlleValidenFelder() {
+	public List<Feld> bestimmeAlleValidenFelder() {	
 		if (zeilenIndex == 0 && (spaltenIndex == 0 || spaltenIndex == 7)
 				|| zeilenIndex == 7 && (spaltenIndex == 0 || spaltenIndex == 7)) {
 			return bestimmeAlleValidenFelderEcke();
@@ -382,6 +420,20 @@ public class Koenig extends Figur {
 			return bestimmeAlleValidenFelderRand();
 		}
 		return bestimmeAlleValidenFelderInnen();
+	}
+
+	/**
+	 * @return the unbewegt
+	 */
+	public boolean isUnbewegt() {
+		return unbewegt;
+	}
+
+	/**
+	 * @param unbewegt the unbewegt to set
+	 */
+	public void setUnbewegt(boolean unbewegt) {
+		this.unbewegt = unbewegt;
 	}
 
 }
