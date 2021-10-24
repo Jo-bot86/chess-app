@@ -18,8 +18,8 @@ Examples of illegal moves are:
 * JavaFX 11.0.2
 
 ## *Sceenshots*
-![chess board](../chessPic1.png?raw=true)
-![chess board](../chessPic2.png?raw=true)
+![chess board](resources/screenshots/chessPic1.png?raw=true)
+![chess board](resources/screenshots/chessPic2.png?raw=true)
 
 ## *Features*
 
