@@ -346,7 +346,10 @@ public class SchachApp extends Application implements Startable {
 						((Turm) tmpFigurInBrett).setUnbewegt(false);
 					}
 //					felder[0][0].setGraphic(umwandelbareFigurenWeiss);
-
+//					System.out.println(GridPane.getColumnIndex(felder[1][0]));
+//					brett.addColumn(1, umwandelbareFigurenWeiss);
+					
+					
 				}
 			}
 		});
@@ -743,6 +746,10 @@ public class SchachApp extends Application implements Startable {
 					felder[j][i].setFigur(koenigWeissView);
 
 				}
+//				Dreht die Figuren um 180°C
+//				if(aktuelleFigur != null) {
+//				felder[j][i].getFigur().setRotate(180);
+//				}
 			}
 		}
 	}
@@ -784,6 +791,8 @@ public class SchachApp extends Application implements Startable {
 	public void erstelleHauptbereich() {
 		hauptbereich = new BorderPane();
 		brett = new GridPane();
+//		Dreht das Spielbrett um 180°C
+//		brett.setRotate(180);
 		spielVerlauf = new Label("Hier steht der Verlauf des Spiels");
 		geschlageneFigurenSchwarz = new HBox();
 		geschlageneFigurenWeiss = new HBox();
@@ -854,7 +863,6 @@ public class SchachApp extends Application implements Startable {
 					feld.setSchwarzesFeld(false);
 				}
 				handleMouseOnClick(feld);
-
 				brett.add(feld, spalte, zeile);
 			}
 		}
